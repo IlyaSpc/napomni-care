@@ -1,38 +1,29 @@
-import { useEffect, useState } from 'react';
-import StartScreen from './components/StartScreen';
+import React, { useEffect, useState } from 'react';
+import './App.css';
 
 function App() {
-  const [telegramUser, setTelegramUser] = useState(null);
+  const [tgData, setTgData] = useState(null);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
+    const initData = window.Telegram?.WebApp?.initDataUnsafe;
 
-    if (tg) {
-      tg.ready(); // уведомить Telegram, что мы готовы
-      const user = tg.initDataUnsafe?.user;
-
-      console.log('📦 Telegram WebApp:', tg);
-      console.log('🙋 Пользователь из initData:', user);
-
-      if (user) {
-        setTelegramUser(user);
-      } else {
-        console.warn('⚠️ Нет данных о пользователе!');
-      }
+    if (initData && initData.user) {
+      setTgData(initData.user);
     } else {
-      console.warn('🚫 Telegram WebApp API недоступен!');
+      setTgData(null);
     }
   }, []);
 
   return (
-    <div>
-      {telegramUser ? (
-        <StartScreen telegramUser={telegramUser} />
+    <div className="app-container">
+      <h1>Напомни мне</h1>
+      {tgData ? (
+        <>
+          <p>👤 Telegram ID: {tgData.id}</p>
+          <p>Добро пожаловать, {tgData.first_name}!</p>
+        </>
       ) : (
-        <div style={{ padding: '3rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
-          <h1>Напомни мне</h1>
-          <p>⏳ Получаем данные пользователя из Telegram...</p>
-        </div>
+        <p>⌛ Получаем данные пользователя из Telegram...</p>
       )}
     </div>
   );
